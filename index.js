@@ -21,12 +21,19 @@ async function run() {
   try {
     await client.connect();
     const partsCollection = client.db("lampzone").collection("parts");
+    const reviewsCollection = client.db("lampzone").collection("reviews");
     app.get("/parts",async(req,res) => {
       const query = {};
       const cursor = partsCollection.find(query);
       const parts = await cursor.toArray();
       res.send(parts)
     });
+    app.get("/reviews",async(req,res) => {
+      const query = {};
+      const cursor = reviewsCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    })
   }
   finally {
 
