@@ -23,6 +23,7 @@ async function run() {
     const partsCollection = client.db("lampzone").collection("parts");
     const reviewsCollection = client.db("lampzone").collection("reviews");
     const orderCollection = client.db("lampzone").collection("orders");
+    const newsLetterCollection = client.db("lampzone").collection("newsletter");
     app.get("/parts",async(req,res) => {
       const query = {};
       const cursor = partsCollection.find(query);
@@ -41,10 +42,28 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     })
+    app.post("/reviews",async(req,res) => {
+      const review = req.body;
+      const doc = review;
+      const result = await reviewsCollection.insertOne(doc);
+      res.send({success:true,result})
+    })
+    app.get("/orders",async(req,res) => {
+      const email = req.query.email;
+      const query = {email:email};
+      const orders = await orderCollection.find(query).toArray();
+      res.send(orders);
+    })
     app.post("/orders",async(req,res) => {
       const orders = req.body;
       const doc = orders;
       const result = await orderCollection.insertOne(doc);
+      res.send({success:true,result})
+    })
+    app.post("/newsletter",async(req,res) => {
+      const userInfo = req.body;
+      const doc = userInfo;
+      const result = await newsLetterCollection.insertOne(doc);
       res.send({success:true,result})
     })
   }
