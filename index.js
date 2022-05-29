@@ -22,6 +22,7 @@ async function run() {
     await client.connect();
     const partsCollection = client.db("lampzone").collection("parts");
     const reviewsCollection = client.db("lampzone").collection("reviews");
+    const orderCollection = client.db("lampzone").collection("orders");
     app.get("/parts",async(req,res) => {
       const query = {};
       const cursor = partsCollection.find(query);
@@ -39,6 +40,12 @@ async function run() {
       const cursor = reviewsCollection.find(query);
       const reviews = await cursor.toArray();
       res.send(reviews);
+    })
+    app.post("/orders",async(req,res) => {
+      const orders = req.body;
+      const doc = orders;
+      const result = await orderCollection.insertOne(doc);
+      res.send({success:true,result})
     })
   }
   finally {
