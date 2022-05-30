@@ -42,6 +42,7 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     })
+    // Get 8 reviews for homepage
     app.get("/eight-reviews",async(req,res) => {
       const query = {};
       const cursor = reviewsCollection.find(query).limit(8);
