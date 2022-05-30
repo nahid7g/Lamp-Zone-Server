@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { MongoClient, ServerApiVersion,ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -24,55 +24,80 @@ async function run() {
     const reviewsCollection = client.db("lampzone").collection("reviews");
     const orderCollection = client.db("lampzone").collection("orders");
     const newsLetterCollection = client.db("lampzone").collection("newsletter");
-    app.get("/parts",async(req,res) => {
+    const userCollection = client.db("lampzone").collection("users");
+    app.get("/parts", async (req, res) => {
       const query = {};
       const cursor = partsCollection.find(query);
       const parts = await cursor.toArray();
-      res.send(parts)
+      res.send(parts);
     });
-    app.get("/parts/:id",async(req,res) =>{
+    app.get("/parts/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id:ObjectId(id)};
+      const query = { _id: ObjectId(id) };
       const part = await partsCollection.findOne(query);
       res.send(part);
-    })
-    app.get("/reviews",async(req,res) => {
+    });
+    app.get("/reviews", async (req, res) => {
       const query = {};
       const cursor = reviewsCollection.find(query);
       const reviews = await cursor.toArray();
       res.send(reviews);
-    })
-    // Post Reviews 
-    app.post("/reviews",async(req,res) => {
+    });
+    // Post Reviews
+    app.post("/reviews", async (req, res) => {
       const review = req.body;
       const doc = review;
       const result = await reviewsCollection.insertOne(doc);
-      res.send({success:true,result})
-    })
-    app.get("/orders",async(req,res) => {
+      res.send({ success: true, result });
+    });
+    app.get("/orders", async (req, res) => {
       const email = req.query.email;
-      const query = {email:email};
+      const query = { email: email };
       const orders = await orderCollection.find(query).toArray();
       res.send(orders);
+    });
+    app.get("/users",async(req,res) => {
+      const email = req.query.email;
+      const query = {email:email};
+      const users = await userCollection.findOne(query)
+      res.send(users)
     })
-    app.post("/orders",async(req,res) => {
+    app.post("/orders", async (req, res) => {
       const orders = req.body;
       const doc = orders;
       const result = await orderCollection.insertOne(doc);
-      res.send({success:true,result})
-    })
-    app.post("/newsletter",async(req,res) => {
+      res.send({ success: true, result });
+    });
+    app.post("/newsletter", async (req, res) => {
       const userInfo = req.body;
       const doc = userInfo;
       const result = await newsLetterCollection.insertOne(doc);
-      res.send({success:true,result})
-    })
-  }
-  finally {
-
+      res.send({ success: true, result });
+    });
+    // Update user information
+    app.put("/users", async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          education: user?.education,
+          city: user.city,
+          phone: user.phone,
+          linkedin: user.linkedin
+        },
+      };
+      const result = await userCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+  } finally {
   }
 }
-run().catch(console.dir)
+run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("Hola! Server working perfectly");
