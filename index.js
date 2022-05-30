@@ -42,6 +42,12 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     })
+    app.get("/eight-reviews",async(req,res) => {
+      const query = {};
+      const cursor = reviewsCollection.find(query).limit(8);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    })
     app.post("/reviews",async(req,res) => {
       const review = req.body;
       const doc = review;
